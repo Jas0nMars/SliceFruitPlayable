@@ -1,43 +1,40 @@
+import { _decorator, Component, Node, SpriteFrame } from "cc";
+import FruitPoolMgr from "./FruitPoolMgr";
+import InGameUI from "../UI/InGameUI";
+import LevelMgr from "../Level/LevelMgr";
+import ToastUI from "../UI/ToastUI";
 
-import Knife from "./Knife"
-import FruitPoolMgr from "./FruitPoolMgr"
-import InGameUI from "../UI/InGameUI"
-import LevelMgr from "../Level/LevelMgr"
-import ToastUI from "../UI/ToastUI"
-
-const {ccclass, property} = cc._decorator;
+const { ccclass, property } = _decorator;
 
 @ccclass
-export default class Game extends cc.Component {
+export default class Game extends Component {
 
-    @property(cc.Node)
-    game_ui:cc.Node = null;
+    @property(Node)
+    game_ui: Node = null;
 
-    @property(cc.Node)
-    toast_ui:cc.Node = null;
+    @property(Node)
+    toast_ui: Node = null;
 
-    @property([cc.SpriteFrame])
-    fruit_imgs:Array<cc.SpriteFrame> = [];
+    @property([SpriteFrame])
+    fruit_imgs: Array<SpriteFrame> = [];
 
-    knife:Knife = null;
-    fruitPoolMgr:FruitPoolMgr = null;
-    inGameUI:InGameUI = null;
-    levelMgr:LevelMgr = null;
-    toastUI:ToastUI = null;
+    fruitPoolMgr: FruitPoolMgr = null;
+    inGameUI: InGameUI = null;
+    levelMgr: LevelMgr = null;
+    toastUI: ToastUI = null;
 
-    kill_fruit_num:number = 0;
+    kill_fruit_num: number = 0;
 
-    onLoad(){
-        this.fruitPoolMgr = this.node.getComponent("FruitPoolMgr");
-        this.inGameUI = this.game_ui.getComponent("InGameUI");
-        this.levelMgr = this.node.getComponent("LevelMgr");
-        this.toastUI = this.toast_ui.getComponent("ToastUI");
+    onLoad() {
+        this.fruitPoolMgr = this.node.getComponent(FruitPoolMgr);
+        this.inGameUI = this.game_ui.getComponent(InGameUI);
+        this.levelMgr = this.node.getComponent(LevelMgr);
+        this.toastUI = this.toast_ui.getComponent(ToastUI);
     }
 
-    start(){
+    start() {
         this.levelMgr.init(this);
         this.fruitPoolMgr.init(this);
         this.inGameUI.init(this);
     }
-
 }

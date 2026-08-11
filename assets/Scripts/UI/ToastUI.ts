@@ -1,20 +1,23 @@
+import { _decorator, Component, Node, Label, UITransform } from "cc";
 
-const {ccclass, property} = cc._decorator;
+const { ccclass, property } = _decorator;
 
 @ccclass
-export default class TOastUI extends cc.Component {
+export default class ToastUI extends Component {
 
-    @property(cc.Node)
-    msg_label: cc.Node = null;
+    @property(Node)
+    msg_label: Node = null;
 
-    show_toast(msg:string){
+    show_toast(msg: string) {
         this.unscheduleAllCallbacks();
-        this.msg_label.getComponent(cc.Label).string = msg;
-        this.node.width = msg.length * 40 + 80;
+        this.msg_label.getComponent(Label).string = msg;
+        let uiTransform = this.node.getComponent(UITransform);
+        if (uiTransform) {
+            uiTransform.width = msg.length * 40 + 80;
+        }
         this.node.active = true;
-        this.scheduleOnce(function(){
+        this.scheduleOnce(() => {
             this.node.active = false;
-        }.bind(this),2);
+        }, 2);
     }
-
 }

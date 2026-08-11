@@ -1,40 +1,33 @@
-import Game from "./Game"
+import { _decorator, Component } from "cc";
+// 需要在项目设置中启用 DragonBones 模块
+import { dragonBones, ArmatureDisplay } from "dragonBones";
+import Game from "./Game";
 
-const {ccclass, property} = cc._decorator;
+const { ccclass, property } = _decorator;
 
 @ccclass
-export default class FruitEffect extends cc.Component {
-    //果汁颜色:0 红色，1 绿色，2 黄色
-    @property(cc.Integer)
-    color_type:number = 0;
-    game:Game = null;
-    
-    dragonDisplay:dragonBones.ArmatureDisplay = null;
-    
-    init(game){
+export default class FruitEffect extends Component {
+
+    @property
+    color_type: number = 0;
+
+    game: Game = null;
+    dragonDisplay: ArmatureDisplay = null;
+
+    init(game: Game) {
         this.game = game;
-        this.dragonDisplay = this.node.getComponent(dragonBones.ArmatureDisplay);
+        this.dragonDisplay = this.node.getComponent(ArmatureDisplay);
         this.dragonDisplay.addEventListener(dragonBones.EventObject.COMPLETE, this.animationEventHandler, this);
     }
 
-    //播放水果特效
-    play_fruit_effect(){
+    play_fruit_effect() {
         this.node.active = true;
-        this.dragonDisplay.playAnimation("newAnimation",1);
+        this.dragonDisplay.playAnimation("newAnimation", 1);
     }
 
-    animationEventHandler(event){
-        if (event.type == dragonBones.EventObject.COMPLETE) {
-            //果汁颜色:0 红色，1 绿色，2 黄色
-            if(this.color_type == 0){
-                this.game.fruitPoolMgr.returnRedFruitEffect(this.node);
-            }else if(this.color_type == 1){
-                this.game.fruitPoolMgr.returnGreenFruitEffect(this.node);
-            }else if(this.color_type == 2){
-                this.game.fruitPoolMgr.returnYellowFruitEffect(this.node);
-            }else{
-                this.game.fruitPoolMgr.returnWhiteFruitEffect(this.node);
-            }
-        } 
+    animationEventHandler(event: any) {
+        if (event.type === dragonBones.EventObject.COMPLETE) {
+            this.game.fruitPoolMgr.returnWhiteFruitEffect(this.node);
+        }
     }
 }
