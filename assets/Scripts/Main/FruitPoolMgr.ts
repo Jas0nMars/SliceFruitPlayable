@@ -1,4 +1,4 @@
-import { _decorator, Component, Prefab, SpriteFrame, instantiate, Node } from "cc";
+import { _decorator, Component, Prefab, instantiate, Node } from "cc";
 import Game from "./Game";
 import FruitEffect from "./FruitEffect";
 
@@ -6,9 +6,6 @@ const { ccclass, property } = _decorator;
 
 @ccclass
 export default class FruitPoolMgr extends Component {
-
-    @property(SpriteFrame)
-    guozhi_icon: SpriteFrame = null;
 
     @property(Prefab)
     fruit_prefab: Prefab = null;

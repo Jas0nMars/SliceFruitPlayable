@@ -50,7 +50,6 @@ export default class Knife extends Component {
                 } else {
                     //未切中水果
                     this.game.inGameUI.is_gaming = false;
-                    this.game.toastUI.show_toast("未切中水果!");
                     this.scheduleOnce(() => {
                         this.game.levelMgr.reset_level_state();
                         this.game.levelMgr.cur_wave_idx = 0;
