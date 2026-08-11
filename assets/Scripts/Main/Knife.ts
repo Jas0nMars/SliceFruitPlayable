@@ -39,9 +39,6 @@ export default class Knife extends cc.Component {
         if(this.knife_type == 0){//左边飞刀
             x  = -100
         }else if(this.knife_type == 1){//中间飞刀
-           
-            //播放飞刀声音
-            this.game.soundMgr.play_shoot_audio();
             x  = 0
         }else if(this.knife_type == 2){//右边飞刀
            x  = 100
@@ -52,38 +49,22 @@ export default class Knife extends cc.Component {
         let move = cc.moveTo(0.6,cc.v2(x * 2,this.height-300));
         let end_func = function(){
             if(this.knife_type == 1){
-                this.update_try_knife_count();
-                //计算获取的金币
+                //判断是否切中水果
                 if(this.game.inGameUI.combo_kill_num > 0){//切中水果
-                    let cur_gold = 0;
-                    if(this.game.inGameUI.combo_kill_num <= 7 ){
-                        cur_gold = FruitData.kill_combo_gold[this.game.inGameUI.combo_kill_num-1];
-                    }else{
-                        cur_gold = (this.game.inGameUI.combo_kill_num - 7)*10 + 20;
-                    }
-                    this.game.baseBgUI.plus_cur_level_gold(cur_gold);
-                    this.game.levelMgr.level_get_gold += cur_gold;
                     //判断是否一刀切
                     if(this.game.inGameUI.combo_kill_num==this.game.levelMgr.cur_wave_total){
-                        //一刀切
                         this.game.levelMgr.is_one_kill = true;
-                        this.game.inGameUI.play_pet_combo_anim();
                         this.game.inGameUI.one_kill.getComponent(cc.Animation).play();
                     }
                 }else{//未切中水果，游戏失败
-                    this.game.inGameUI.play_pet_fail_anim();
-                    this.game.soundMgr.play_fail_audio();
                     this.game.inGameUI.is_gaming = false;
-                    if(this.game.isOpenShare){
-                        this.game.bannerAd.hideGameBannerAd();
-                        this.game.rebirthUI.show_rebirth_ui();
-                    }else{
+                    this.game.toastUI.show_toast("未切中水果!");
+                    //延迟后重新开始当前波次
+                    this.scheduleOnce(function(){
                         this.game.levelMgr.reset_level_state();
-                        this.game.inGameUI.hide_game_ui();
-                        this.game.baseBgUI.show_home_gold_ui();
-                        //跳转到游戏结束界面
-                        this.game.gameoverUI.show_gameover_ui();
-                    }
+                        this.game.levelMgr.cur_wave_idx = 0;
+                        this.game.levelMgr.start_wave();
+                    }.bind(this), 1.5);
                 }
                 //重置连切数量
                 this.game.inGameUI.combo_kill_num = 0;
@@ -96,22 +77,6 @@ export default class Knife extends cc.Component {
             }
         }.bind(this);
         this.node.runAction(cc.sequence([move,cc.callFunc(end_func)]));
-    }
-
-    //判断试用武器次数是否使用完
-    update_try_knife_count(){
-        if(this.game.wuqiUI.is_try_knife){
-            this.game.wuqiUI.try_knife_count--;
-            if(this.game.wuqiUI.try_knife_count==0){
-                this.game.toastUI.show_toast("体验武器次数已用完！");
-                this.game.wuqiUI.is_try_knife = false;
-                this.game.dataMgr.set_try_knife_count(0);
-                this.game.wuqiUI.pre_cell_com.hide_try_knife_icon();
-                this.game.wuqiUI.load_cur_select_own_knife();
-            }else{
-                this.game.dataMgr.set_try_knife_count(this.game.wuqiUI.try_knife_count);
-            }
-        }
     }
 
     //播放飞到旋转动画
@@ -138,8 +103,6 @@ export default class Knife extends cc.Component {
     }
 
     onCollisionEnter(other:cc.Collider, self:cc.Collider){
-        //播放水果被切的声音
-        this.game.soundMgr.play_kill_fruit_audio();
         let fruit_node = other.node;
         let fruit_com = fruit_node.getComponent("Fruit");
         if(fruit_com.is_killed){
@@ -148,12 +111,9 @@ export default class Knife extends cc.Component {
         fruit_com.is_killed = true;
         let fruit_type = fruit_com.fruit_type - 1;
         //坐标系转换
-        //1.将fruit_node的坐标转换到世界坐标
         let fruit_w_pos = fruit_node.parent.convertToWorldSpaceAR(fruit_node.getPosition());
-        //2.将世界坐标转换到map坐标系
         let fruit_h_pos = this.game.inGameUI.half_ui.convertToNodeSpaceAR(fruit_w_pos);
         fruit_node.active = false;
-        //this.game.fruitPoolMgr.returnFruit(fruit_node.parent);
         //左边半个水果
         let left_fruit = this.game.fruitPoolMgr.requestLeftFruit();
         left_fruit.getComponent(cc.Sprite).spriteFrame = this.game.fruit_half_imgs[fruit_type];
@@ -208,16 +168,6 @@ export default class Knife extends cc.Component {
         this.game.inGameUI.combo_kill_num++;
         //更新切的水果进度
         this.game.levelMgr.update_level_progress();
-        //震动1次
-        if(typeof(wx) != 'undefined') {
-            wx.vibrateShort();
-        }
-    }
-
-
-    //飞到射转盘完成
-    shoot_zhuanpan_finished(){
-        this.game.inGameUI.stop_zhuanpan();
     }
 
     
