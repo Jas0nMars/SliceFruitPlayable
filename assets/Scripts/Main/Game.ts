@@ -36,6 +36,7 @@ export default class Game extends Component {
     cashSystem: CashSystem = null;
 
     kill_fruit_num: number = 0;
+    is_level_ended: boolean = false; // 关卡是否已结束（防止重复触发）
 
     onLoad() {
         this.fruitPoolMgr = this.node.getComponent(FruitPoolMgr);
@@ -76,6 +77,14 @@ export default class Game extends Component {
     update(dt: number) {
         if (this.cashSystem) {
             this.cashSystem.update(dt);
+        }
+
+        // 飞刀累计 3 次消除但尚未通关，强制通关
+        if (!this.is_level_ended && this.inGameUI && this.inGameUI.center_knife_node_com) {
+            if (this.inGameUI.center_knife_node_com.throw_elimination_count >= 3) {
+                this.is_level_ended = true;
+                this.levelMgr.end_level();
+            }
         }
     }
 

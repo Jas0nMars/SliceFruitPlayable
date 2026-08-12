@@ -31,6 +31,10 @@ export default class Knife extends Component {
     private _rotateTween: any = null;
     private _is_shooting: boolean = false;
 
+    // 飞刀消除计数：每投掷一次发生消除算一次，累计 3 次强制通关
+    throw_elimination_count: number = 0;
+    private _throw_kill_count: number = 0; // 当前投掷的切中数
+
     // 半水果追踪数据
     private _halfFruits: Node[] = [];
     private _halfData: {
@@ -59,6 +63,7 @@ export default class Knife extends Component {
         this.node.setRotationFromEuler(0, 0, 0);
         this.node.setPosition(0, this.knife_y, 0);
         this._is_shooting = true;
+        this._throw_kill_count = 0; // 重置本次投掷切中计数
 
 
 
@@ -76,6 +81,12 @@ export default class Knife extends Component {
             .call(() => {
                 this._is_shooting = false;
                 if (this._rotateTween) { this._rotateTween.stop(); this._rotateTween = null; }
+
+                // 本次投掷有切中水果，累计消除次数
+                if (this._throw_kill_count > 0) {
+                    this.throw_elimination_count++;
+                }
+                this._throw_kill_count = 0;
 
                 this.game.inGameUI.combo_kill_num = 0;
 
@@ -129,6 +140,7 @@ export default class Knife extends Component {
 
     _slice_fruit(fruit_node: Node, fruit_com: Fruit) {
         fruit_com.is_killed = true;
+        this._throw_kill_count++; // 累计本次投掷切中数
 
         //坐标系转换：取水果自身世界坐标，转为 fruit_effect_ui 本地坐标
         let fruit_w_pos = fruit_node.worldPosition.clone();
