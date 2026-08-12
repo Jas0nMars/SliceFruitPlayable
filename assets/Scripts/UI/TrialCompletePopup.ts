@@ -1,6 +1,7 @@
 import { _decorator, AudioClip, AudioSource, Component, Label, Node, Sprite, SpriteFrame, tween, UIOpacity, UITransform, Vec3 } from 'cc';
 import Game from '../Main/Game';
 import { I18nManager } from '../Main/I18nManager';
+import { SDKManager } from '../Main/SDKManager';
 const { ccclass, property } = _decorator;
 
 /**
@@ -378,11 +379,11 @@ export class TrialCompletePopup extends Component {
      */
     click_close() {
         console.log("[TrialComplete] 点击关闭/CTA");
-        // SDKManager.instance?.triggerDownload();
+        SDKManager.instance?.triggerDownload();
         this.node.active = false;
     }
 
     gameEnd() {
-        // SDKManager.instance?.gameEnd();
+        SDKManager.instance?.gameEnd();
     }
 }

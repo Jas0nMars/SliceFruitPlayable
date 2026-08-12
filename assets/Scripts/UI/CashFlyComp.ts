@@ -56,8 +56,15 @@ export class CashFlyComp extends Component {
         const targetWorldPos = targetNode.getWorldPosition();
         const targetLocal = uiTransform.convertToNodeSpaceAR(targetWorldPos);
 
+        // 基于距离计算飞行时长，保证横竖屏下速度一致
+        const dx = targetLocal.x - startLocal.x;
+        const dy = targetLocal.y - startLocal.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const flySpeed = 1500; // 像素/秒
+        const duration = Math.max(0.2, Math.min(distance / flySpeed, 0.8));
+
         tween(flyNode)
-            .to(0.5, {
+            .to(duration, {
                 position: targetLocal,
                 scale: new Vec3(0.3, 0.3, 1)
             }, { easing: 'sineOut' })

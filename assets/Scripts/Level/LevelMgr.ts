@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, tween, Tween, Vec3, Sprite } from "cc";
+import { _decorator, Component, Node, tween, Tween, Vec3, Sprite, view } from "cc";
 import Game from "../Main/Game";
 import Fruit from "../Main/Fruit";
 import FruitData from "../Main/FruitData";
@@ -62,12 +62,18 @@ export default class LevelMgr extends Component {
     start_wave() {
         let wave = this.level_arr[this.cur_level_idx].waves[this.cur_wave_idx];
         this.cur_wave_total = wave.fruit_shape.length;
-        this.fruit_ui.setPosition(0, 600, 0);
+
+        // 检测当前是否横屏（用于决定入场动画坐标）
+        let is_landscape = this._is_landscape();
+        let start_y = is_landscape ? 400 : 600;
+        let end_y = is_landscape ? 100 : 200;
+
+        this.fruit_ui.setPosition(0, start_y, 0);
         this.fruit_20_level(wave);
 
         //水果入场动画：从上方滑入 + 开始旋转
         tween(this.fruit_ui)
-            .to(0.2, { position: new Vec3(0, 200, 0) })
+            .to(0.2, { position: new Vec3(0, end_y, 0) })
             .call(() => {
                 //入场完成后开始持续旋转
                 tween(this.fruit_ui)
@@ -78,6 +84,18 @@ export default class LevelMgr extends Component {
                 this.game.inGameUI.is_gaming = true;
             })
             .start();
+
+        // start_wave 的 tween 会与 ScreenLayoutManager.apply_layout 冲突（tween 动画覆盖布局坐标）
+        // 无论横竖屏都停止 tween，由 _apply_screen_layout 统一设置正确位置后重启旋转
+        Tween.stopAllByTarget(this.fruit_ui);
+        this._apply_screen_layout();
+        // 重新启动旋转 tween（从正确位置开始）
+        tween(this.fruit_ui)
+            .by(2, { eulerAngles: new Vec3(0, 0, -360) })
+            .union()
+            .repeatForever()
+            .start();
+        this.game.inGameUI.is_gaming = true;
     }
 
     fruit_20_level(cur_wave: Wave) {
@@ -144,5 +162,30 @@ export default class LevelMgr extends Component {
         Tween.stopAllByTarget(this.fruit_ui);
         this.fruit_ui.eulerAngles = Vec3.ZERO;
         this.kill_num = 0;
+    }
+
+    /** 检测当前是否横屏（直接读取屏幕尺寸，不依赖 ScreenLayoutManager 状态） */
+    private _is_landscape(): boolean {
+        let size = view.getVisibleSize();
+        return size.width > size.height;
+    }
+
+    /** 通知 ScreenLayoutManager 重新应用布局 */
+    private _apply_screen_layout() {
+        let screenMgr = this.node.getComponent('ScreenLayoutManager') as any;
+        if (screenMgr && screenMgr.apply_layout) {
+            // 同步横竖屏状态（ScreenLayoutManager.start 可能尚未执行）
+            let is_landscape = this._is_landscape();
+            if (screenMgr.is_landscape !== is_landscape) {
+                screenMgr.is_landscape = is_landscape;
+                // 同步设计分辨率交换
+                if (is_landscape) {
+                    view.setDesignResolutionSize(screenMgr._origin_design_h, screenMgr._origin_design_w, view.getResolutionPolicy());
+                } else {
+                    view.setDesignResolutionSize(screenMgr._origin_design_w, screenMgr._origin_design_h, view.getResolutionPolicy());
+                }
+            }
+            screenMgr.apply_layout();
+        }
     }
 }

@@ -49,7 +49,6 @@ export default class Knife extends Component {
     }[] = [];
 
     onLoad() {
-        this.height = view.getVisibleSize().height;
         this.knife_y = this.node.position.y;
     }
 
@@ -60,12 +59,24 @@ export default class Knife extends Component {
 
     //发射飞刀
     shoot_knife(finish_func: Function) {
+        // 发射飞刀音效
+        if (this.game.soundMgr) {
+            this.game.soundMgr.play_shoot();
+        }
+
+        // 动态获取当前屏幕尺寸（横竖屏切换后会变化）
+        let curHeight = view.getVisibleSize().height;
+
+        // 飞刀 X 坐标由 ScreenLayoutManager 通过 layout_items 控制，这里读取节点当前位置
+        let knifeX = this.node.position.x;
+
         this.node.setRotationFromEuler(0, 0, 0);
-        this.node.setPosition(0, this.knife_y, 0);
+        // 动态读取当前 Y，避免横竖屏切换后使用旧的 knife_y
+        let curY = this.node.position.y;
+        console.log(`[Knife] shoot_knife: knifeX=${knifeX.toFixed(1)}, curY=${curY.toFixed(1)}, knife_y=${this.knife_y.toFixed(1)}, endY=${(curHeight * 0.75).toFixed(1)}, curHeight=${curHeight.toFixed(1)}`);
+        this.node.setPosition(knifeX, curY, 0);
         this._is_shooting = true;
         this._throw_kill_count = 0; // 重置本次投掷切中计数
-
-
 
         //停止待机浮动
         if (this._idleTween) { this._idleTween.stop(); this._idleTween = null; }
@@ -75,9 +86,10 @@ export default class Knife extends Component {
             .by(0.6, { eulerAngles: new Vec3(0, 0, -2160) })
             .start();
 
-        //向上移动
+        //向上移动（终点根据横竖屏动态计算）
+        let endY = curHeight * 0.75;
         tween(this.node)
-            .to(0.6, { position: new Vec3(0, this.height - 300, 0) })
+            .to(0.6, { position: new Vec3(knifeX, endY, 0) })
             .call(() => {
                 this._is_shooting = false;
                 if (this._rotateTween) { this._rotateTween.stop(); this._rotateTween = null; }
@@ -90,7 +102,7 @@ export default class Knife extends Component {
 
                 this.game.inGameUI.combo_kill_num = 0;
 
-                this.node.setPosition(0, this.knife_y, 0);
+                this.node.setPosition(knifeX, curY, 0);
                 this.node.setRotationFromEuler(0, 0, 0);
                 this.play_idle_anim();
                 if (finish_func) finish_func();
@@ -99,10 +111,12 @@ export default class Knife extends Component {
     }
 
     play_idle_anim() {
-        //待机浮动动画
+        //待机浮动动画（X/Y 坐标由 ScreenLayoutManager 控制，knife_y 在 _restart_knife_idle 中同步）
+        let knifeX = this.node.position.x;
+        console.log(`[Knife] play_idle_anim: knifeX=${knifeX.toFixed(1)}, knife_y=${this.knife_y.toFixed(1)}, nodePos=(${this.node.position.x.toFixed(1)}, ${this.node.position.y.toFixed(1)})`);
         this._idleTween = tween(this.node)
-            .to(0.5, { position: new Vec3(0, this.knife_y + 30, 0) }, { easing: "sineInOut" })
-            .to(0.5, { position: new Vec3(0, this.knife_y - 30, 0) }, { easing: "sineInOut" })
+            .to(0.5, { position: new Vec3(knifeX, this.knife_y + 30, 0) }, { easing: "sineInOut" })
+            .to(0.5, { position: new Vec3(knifeX, this.knife_y - 30, 0) }, { easing: "sineInOut" })
             .union()
             .repeatForever()
             .start();
@@ -141,6 +155,11 @@ export default class Knife extends Component {
     _slice_fruit(fruit_node: Node, fruit_com: Fruit) {
         fruit_com.is_killed = true;
         this._throw_kill_count++; // 累计本次投掷切中数
+
+        // 切水果音效
+        if (this.game.soundMgr) {
+            this.game.soundMgr.play_kill_fruit();
+        }
 
         //坐标系转换：取水果自身世界坐标，转为 fruit_effect_ui 本地坐标
         let fruit_w_pos = fruit_node.worldPosition.clone();

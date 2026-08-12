@@ -5,6 +5,8 @@ import LevelMgr from "../Level/LevelMgr";
 import { TrialCompletePopup } from "../UI/TrialCompletePopup";
 import { CashSystem } from "./CashSystem";
 import { I18nManager } from "./I18nManager";
+import { SDKManager } from "./SDKManager";
+import SoundManager from "./SoundManager";
 
 const { ccclass, property } = _decorator;
 
@@ -24,19 +26,36 @@ export default class Game extends Component {
     trial_popup_ui: Node = null; // 试玩完成弹窗
 
     @property(Node)
-    cash_label: Node = null; // 现金标签节点（cash_fly 飞向此节点）
+    cash_label: Node = null; // 竖屏现金标签节点（cash_fly 飞向此节点）
+
+    @property(Node)
+    cash_label_landscape: Node = null; // 横屏现金标签节点
 
     @property({ type: Prefab, tooltip: '现金飞行预制体' })
     cash_fly_prefab: Prefab = null;
+
+    @property({ type: Node })
+    cash_info_portrait: Node = null;  // 竖屏现金信息面板
+
+    @property({ type: Node })
+    cash_info_landscape: Node = null;  // 横屏现金信息面板
+
+    @property({ type: Node })
+    btn_wd_portrait: Node = null;     // 竖屏下载按钮
+
+    @property({ type: Node })
+    btn_wd_landscape: Node = null;    // 横屏下载按钮
 
     fruitPoolMgr: FruitPoolMgr = null;
     inGameUI: InGameUI = null;
     levelMgr: LevelMgr = null;
     trialPopup: TrialCompletePopup = null;
     cashSystem: CashSystem = null;
+    soundMgr: SoundManager = null;
 
     kill_fruit_num: number = 0;
     is_level_ended: boolean = false; // 关卡是否已结束（防止重复触发）
+    is_landscape: boolean = false;   // 当前是否横屏
 
     onLoad() {
         this.fruitPoolMgr = this.node.getComponent(FruitPoolMgr);
@@ -52,12 +71,21 @@ export default class Game extends Component {
         // 初始化多语言系统
         I18nManager.init('pt-BR');
 
+        // 初始化 SDK
+        SDKManager.instance?.initSDK();
+
+        // 初始化音效管理器
+        this.soundMgr = this.node.getComponent(SoundManager);
+        if (!this.soundMgr) {
+            this.soundMgr = this.node.addComponent(SoundManager);
+        }
+
         // 初始化现金系统
         let canvas = find('Canvas');
         this.cashSystem = new CashSystem(
             canvas,
             this.cash_label,
-            null,
+            this.cash_label_landscape,
             { initialAmount: 0 }
         );
 
@@ -92,5 +120,33 @@ export default class Game extends Component {
         this.levelMgr.init(this);
         this.fruitPoolMgr.init(this);
         this.inGameUI.init(this);
+    }
+
+    /** 横竖屏切换时由 ScreenLayoutManager 调用（参考 yanglegeyang MainAction.set_orientation） */
+    set_orientation(is_landscape: boolean) {
+        this.is_landscape = is_landscape;
+        // 切换 cash_info 横竖屏子节点
+        if (this.cash_info_portrait) this.cash_info_portrait.active = !is_landscape;
+        if (this.cash_info_landscape) this.cash_info_landscape.active = is_landscape;
+        // 切换 lb_cash_num 横竖屏标签
+        if (this.cashSystem) {
+            this.cashSystem.setOrientation(is_landscape);
+        }
+        // 切换 btn_wd 横竖屏节点
+        if (this.btn_wd_portrait) this.btn_wd_portrait.active = !is_landscape;
+        if (this.btn_wd_landscape) this.btn_wd_landscape.active = is_landscape;
+    }
+
+    /** 获取当前方向下活跃的现金标签节点 */
+    get_active_cash_label(): Node | null {
+        if (!this.cashSystem) return null;
+        return this.is_landscape ? this.cash_label_landscape : this.cash_label;
+    }
+
+    /**
+     * BtnWd 点击事件：触发下载
+     */
+    click_btn_wd() {
+        SDKManager.instance?.triggerDownload();
     }
 }
