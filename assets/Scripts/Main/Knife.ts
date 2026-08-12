@@ -131,7 +131,7 @@ export default class Knife extends Component {
         fruit_com.is_killed = true;
 
         //坐标系转换：取水果自身世界坐标，转为 fruit_effect_ui 本地坐标
-        let fruit_w_pos = fruit_node.worldPosition;
+        let fruit_w_pos = fruit_node.worldPosition.clone();
         let uiTransform = this.game.inGameUI.fruit_effect_ui.getComponent(UITransform);
         if (!uiTransform) {
             console.error("[Knife] fruit_effect_ui 没有 UITransform 组件!");
@@ -166,6 +166,11 @@ export default class Knife extends Component {
         this.game.levelMgr.update_kill_fruit();
         this.game.kill_fruit_num++;
         this.game.inGameUI.combo_kill_num++;
+
+        // 现金飞行：从水果位置飞向 cash_label
+        if (this.game.cashSystem) {
+            this.game.cashSystem.onBlocksEliminated([fruit_w_pos]);
+        }
     }
 
     _spawn_half_fruit(fruit_node: Node, fruit_type: number) {

@@ -51,10 +51,10 @@ export default class LevelMgr extends Component {
     }
 
     end_level() {
-        // 所有水果切割完成，激活试玩完成弹窗
-        // 弹窗通过 onEnable() 自动播放入场动画
-        if (this.game.trial_popup_ui) {
-            this.game.trial_popup_ui.active = true;
+        // 所有水果切割完成，标记现金系统等待完成
+        // 现金全部飞完后由 CashSystem 回调自动弹出试玩完成弹窗
+        if (this.game.cashSystem) {
+            this.game.cashSystem.markPendingComplete();
         }
     }
 

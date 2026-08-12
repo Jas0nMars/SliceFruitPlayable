@@ -1,8 +1,10 @@
-import { _decorator, Component, Node, SpriteFrame } from "cc";
+import { _decorator, Component, Node, SpriteFrame, find, Prefab } from "cc";
 import FruitPoolMgr from "./FruitPoolMgr";
 import InGameUI from "../UI/InGameUI";
 import LevelMgr from "../Level/LevelMgr";
 import { TrialCompletePopup } from "../UI/TrialCompletePopup";
+import { CashSystem } from "./CashSystem";
+import { I18nManager } from "./I18nManager";
 
 const { ccclass, property } = _decorator;
 
@@ -21,10 +23,17 @@ export default class Game extends Component {
     @property(Node)
     trial_popup_ui: Node = null; // 试玩完成弹窗
 
+    @property(Node)
+    cash_label: Node = null; // 现金标签节点（cash_fly 飞向此节点）
+
+    @property({ type: Prefab, tooltip: '现金飞行预制体' })
+    cash_fly_prefab: Prefab = null;
+
     fruitPoolMgr: FruitPoolMgr = null;
     inGameUI: InGameUI = null;
     levelMgr: LevelMgr = null;
     trialPopup: TrialCompletePopup = null;
+    cashSystem: CashSystem = null;
 
     kill_fruit_num: number = 0;
 
@@ -37,6 +46,36 @@ export default class Game extends Component {
             if (this.trialPopup) {
                 this.trialPopup.game = this;
             }
+        }
+
+        // 初始化多语言系统
+        I18nManager.init('pt-BR');
+
+        // 初始化现金系统
+        let canvas = find('Canvas');
+        this.cashSystem = new CashSystem(
+            canvas,
+            this.cash_label,
+            null,
+            { initialAmount: 0 }
+        );
+
+        // 设置现金飞行预制体
+        if (this.cash_fly_prefab) {
+            this.cashSystem.setCashFlyPrefab(this.cash_fly_prefab);
+        }
+
+        // 所有现金飞行完成后弹出结算弹窗
+        this.cashSystem.setOnCompleteCallback(() => {
+            if (this.trial_popup_ui) {
+                this.trial_popup_ui.active = true;
+            }
+        });
+    }
+
+    update(dt: number) {
+        if (this.cashSystem) {
+            this.cashSystem.update(dt);
         }
     }
 

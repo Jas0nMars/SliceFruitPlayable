@@ -1,5 +1,6 @@
 import { _decorator, AudioClip, AudioSource, Component, Label, Node, Sprite, SpriteFrame, tween, UIOpacity, UITransform, Vec3 } from 'cc';
 import Game from '../Main/Game';
+import { I18nManager } from '../Main/I18nManager';
 const { ccclass, property } = _decorator;
 
 /**
@@ -75,15 +76,23 @@ export class TrialCompletePopup extends Component {
         this._audio_source.playOneShot(this.reward_clip);
     }
 
-    /** 同步现金数值 */
+    /** 同步现金数值（从 CashSystem 读取最终金额） */
     sync_cash() {
         if( !this.lb_cash_num ) return;
-        // let main = this.node.parent.getComponent(MainAction);
-        // if( !main ) return;
-        // let src_label = main.get_active_cash_label()?.getComponent(Label);
-        // if( !src_label ) return;
-        // let label = this.lb_cash_num.getComponent(Label);
-        // if( label ) label.string = src_label.string;
+        if( !this.game || !this.game.cashSystem ) return;
+        let label = this.lb_cash_num.getComponent(Label);
+        if( label ) {
+            let symbol = this._get_currency_symbol();
+            label.string = symbol + this.game.cashSystem.getCashAmount();
+        }
+    }
+
+    /** 根据当前语言获取货币符号 */
+    private _get_currency_symbol(): string {
+        const lang = I18nManager.current_language;
+        if (lang === 'id') return 'Rp';
+        if (lang === 'pt-BR') return 'R$';
+        return '$';
     }
 
     /** 启动光晕旋转动画 */
