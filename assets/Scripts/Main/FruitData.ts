@@ -1,9 +1,9 @@
 import { Vec2 } from "cc";
 
 export default class FruitData {
-    //只保留第1关第1波：5个水果竖排直线
+    //只保留第1关第1波：5个水果竖排直线（水果尺寸 68x90，间距 100）
     public static shape_arr: Array<Array<Vec2>> = [
-        [new Vec2(0, 220), new Vec2(0, 110), new Vec2(0, 0), new Vec2(0, -110), new Vec2(0, -220)],
+        [new Vec2(0, 200), new Vec2(0, 100), new Vec2(0, 0), new Vec2(0, -100), new Vec2(0, -200)],
     ]
 
     //1关1波，引用 shape_arr 索引（1-based）

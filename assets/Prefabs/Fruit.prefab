@@ -133,7 +133,7 @@
     "fileId": "b8Js3xCQhNmpsr/NH2Gkjs"
   },
   {
-    "__type__": "cc.CircleCollider2D",
+    "__type__": "5cb90hjN1RET6oAJG9einOZ",
     "_name": "",
     "_objFlags": 0,
     "node": {
@@ -143,23 +143,12 @@
     "__prefab": {
       "__id__": 7
     },
-    "tag": 0,
-    "_group": 1,
-    "_density": 1,
-    "_sensor": false,
-    "_friction": 0.2,
-    "_restitution": 0,
-    "_offset": {
-      "__type__": "cc.Vec2",
-      "x": 0,
-      "y": 0
-    },
-    "_radius": 40,
+    "fruit_type": 0,
     "_id": ""
   },
   {
     "__type__": "cc.CompPrefabInfo",
-    "fileId": "27CtZo8p9NVrGz9XIYIdni"
+    "fileId": "21ZTwquupBiawhTJZidLfb"
   },
   {
     "__type__": "cc.PrefabInfo",
@@ -170,6 +159,7 @@
       "__id__": 0
     },
     "fileId": "427E4buz5FmZoaW2n1iWpS",
+    "instance": null,
     "targetOverrides": null
   }
 ]

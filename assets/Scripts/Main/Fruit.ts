@@ -1,4 +1,4 @@
-import { _decorator, Component, tween, Vec3, Collider2D } from "cc";
+import { _decorator, Component, tween, Vec3, Collider2D, IPhysics2DContact } from "cc";
 
 const { ccclass, property } = _decorator;
 
@@ -15,6 +15,11 @@ export default class Fruit extends Component {
 
     start() {
         this.self_random_rotate();
+        // 显式注册碰撞事件
+        let collider = this.node.getComponent(Collider2D);
+        if (collider) {
+            collider.on('begin-contact', this.onBeginContact, this);
+        }
     }
 
     //水果自身旋转
@@ -34,7 +39,7 @@ export default class Fruit extends Component {
         }, delay_time);
     }
 
-    onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D) {
+    onBeginContact(selfCollider: Collider2D, otherCollider: Collider2D, contact: IPhysics2DContact | null) {
         this.unscheduleAllCallbacks();
         if (this._rotateTween) {
             this._rotateTween.stop();

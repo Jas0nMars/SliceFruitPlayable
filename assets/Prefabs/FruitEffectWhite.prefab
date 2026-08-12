@@ -127,7 +127,7 @@
       "b": 255,
       "a": 255
     },
-    "playTimes": -1,
+    "playTimes": 1,
     "premultipliedAlpha": false,
     "_defaultArmatureIndexValue": 0,
     "_dragonAsset": {
@@ -139,8 +139,8 @@
       "__expectedType__": "dragonBones.DragonBonesAtlasAsset"
     },
     "_armatureName": "Armature",
-    "_animationName": "",
-    "_animationIndexValue": 0,
+    "_animationName": "newAnimation",
+    "_animationIndexValue": 1,
     "_defaultCacheModeValue": 0,
     "_timeScale": 1,
     "_playTimes": -1,
@@ -162,6 +162,7 @@
       "__id__": 0
     },
     "fileId": "6c5cDldLBOyoYsXpyVPG05",
+    "instance": null,
     "targetOverrides": null
   }
 ]

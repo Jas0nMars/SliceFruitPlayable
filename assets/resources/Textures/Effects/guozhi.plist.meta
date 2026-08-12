@@ -17,16 +17,32 @@
     "srcBlendFactor": 770,
     "dstBlendFactor": 771,
     "startColor": {
-      "_val": 4294967295
+      "_val": 4294967295,
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 255
     },
     "startColorVar": {
-      "_val": 0
+      "_val": 0,
+      "r": 0,
+      "g": 0,
+      "b": 0,
+      "a": 0
     },
     "endColor": {
-      "_val": 4294967295
+      "_val": 4294967295,
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 255
     },
     "endColorVar": {
-      "_val": 0
+      "_val": 0,
+      "r": 0,
+      "g": 0,
+      "b": 0,
+      "a": 0
     },
     "startSize": 36,
     "startSizeVar": 19,
@@ -65,6 +81,6 @@
     "endRadiusVar": 0,
     "rotatePerS": 0,
     "rotatePerSVar": 0,
-    "spriteFrameUuid": ""
+    "spriteFrameUuid": "fba1c792-8c02-4215-a9fd-ba53df9f7efc@f9941"
   }
 }

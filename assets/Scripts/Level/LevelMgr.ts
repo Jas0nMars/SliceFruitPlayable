@@ -24,6 +24,7 @@ export default class LevelMgr extends Component {
         this.game = game;
         this.cur_level_idx = 0;
         this.load_level_data();
+        this.start_level();
     }
 
     load_level_data() {
@@ -50,7 +51,11 @@ export default class LevelMgr extends Component {
     }
 
     end_level() {
-        // 关卡结束，由外部弹窗处理
+        // 所有水果切割完成，激活试玩完成弹窗
+        // 弹窗通过 onEnable() 自动播放入场动画
+        if (this.game.trial_popup_ui) {
+            this.game.trial_popup_ui.active = true;
+        }
     }
 
     start_wave() {
@@ -78,8 +83,8 @@ export default class LevelMgr extends Component {
         for (let i = 0; i < cur_wave.fruit_shape.length; i++) {
             let point = cur_wave.fruit_shape[i];
             let fruit_node = this.game.fruitPoolMgr.requestFruit();
-            fruit_node.getChildByName("fruit").getComponent(Sprite).spriteFrame = this.game.fruit_imgs[cur_wave.fruit_types[i] - 1];
-            let fruit_com = fruit_node.getChildByName("fruit").getComponent(Fruit);
+            fruit_node.getComponent(Sprite).spriteFrame = this.game.fruit_imgs[cur_wave.fruit_types[i] - 1];
+            let fruit_com = fruit_node.getComponent(Fruit);
             fruit_com.fruit_type = cur_wave.fruit_types[i];
             fruit_com.color_type = 3; //白色
             fruit_com.is_killed = false;
@@ -123,6 +128,8 @@ export default class LevelMgr extends Component {
 
     restart_cur_level() {
         this.cur_wave_idx = 0;
+        this.kill_num = 0;
+        this.game.kill_fruit_num = 0;
         this.start_wave();
     }
 

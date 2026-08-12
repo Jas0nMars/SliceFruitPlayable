@@ -1,10 +1,6 @@
 import { _decorator, Component, Node } from "cc";
 import Game from "./Game";
-
 const { ccclass, property } = _decorator;
-
-// TODO: 启用 DragonBones 后恢复完整实现
-// import { dragonBones, ArmatureDisplay } from "dragonBones";
 
 @ccclass
 export default class FruitEffect extends Component {
@@ -20,11 +16,21 @@ export default class FruitEffect extends Component {
 
     play_fruit_effect() {
         this.node.active = true;
-        // 临时：播放后延迟回收
-        this.scheduleOnce(() => {
-            if (this.game) {
-                this.game.fruitPoolMgr.returnWhiteFruitEffect(this.node);
-            }
-        }, 1.0);
+
+        // 显式重播 DragonBones 动画（对象池复用时动画已播完，需要手动重启）
+        let armature: any = this.node.getComponent('dragonBones.ArmatureDisplay');
+        if (armature) {
+            armature.playAnimation('newAnimation', 1);
+        }
+
+        // 定时器回收
+        this.unschedule(this._returnToPool);
+        this.scheduleOnce(this._returnToPool, 1.0);
+    }
+
+    private _returnToPool = () => {
+        if (this.game) {
+            this.game.fruitPoolMgr.returnWhiteFruitEffect(this.node);
+        }
     }
 }
