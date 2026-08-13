@@ -77,7 +77,7 @@ export default class LevelMgr extends Component {
             .call(() => {
                 //入场完成后开始持续旋转
                 tween(this.fruit_ui)
-                    .by(2, { eulerAngles: new Vec3(0, 0, -360) })
+                    .by(2.5, { eulerAngles: new Vec3(0, 0, -360) })
                     .union()
                     .repeatForever()
                     .start();
@@ -91,7 +91,7 @@ export default class LevelMgr extends Component {
         this._apply_screen_layout();
         // 重新启动旋转 tween（从正确位置开始）
         tween(this.fruit_ui)
-            .by(2, { eulerAngles: new Vec3(0, 0, -360) })
+            .by(2.5, { eulerAngles: new Vec3(0, 0, -360) })
             .union()
             .repeatForever()
             .start();

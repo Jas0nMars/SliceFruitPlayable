@@ -213,34 +213,34 @@ export class ScreenLayoutManager extends Component {
      */
     apply_cash_info_layout() {
         if (!this.cash_info) return;
-        let ui = this.cash_info.getComponent(UITransform);
+        let targetNode = this.cash_info;
+        let ui = targetNode.getComponent(UITransform);
         if (!ui) return;
-        let widget = this.cash_info.getComponent(Widget);
+        let widget = targetNode.getComponent(Widget);
         // 禁用 Widget，完全手动控制
         if (widget) widget.enabled = false;
 
-        // 用 max/min 确保无论 _origin_design_w/h 是否被交换，都能得到正确的画布尺寸
-        let portrait_w = Math.min(this._origin_design_w, this._origin_design_h);
-        let portrait_h = Math.max(this._origin_design_w, this._origin_design_h);
-        let canvas_w = this.is_landscape ? portrait_h : portrait_w;
-        let canvas_h = this.is_landscape ? portrait_w : portrait_h;
+        // 使用引擎 API 获取实际可见画布尺寸（适配不同机型）
+        let visibleSize = view.getVisibleSize();
+        let canvas_w = visibleSize.width;
+        let canvas_h = visibleSize.height;
 
         console.log(`[ScreenLayoutManager] apply_cash_info_layout: is_landscape=${this.is_landscape}, canvas=${canvas_w}x${canvas_h}, origin=(${this._origin_design_w},${this._origin_design_h}), anchor=(${ui.anchorX},${ui.anchorY})`);
 
         if (this.is_landscape) {
-            // 横屏：画布 1560×750，528×300，距离左侧 50px，Y 居中
+            // 横屏：528×300，距离左侧 50px，Y 居中
             ui.setContentSize(528, 300);
             let x = -canvas_w / 2 + 50 + 528 * (1 - ui.anchorX);
             let y = 300 * (0.5 - ui.anchorY);
-            this.cash_info.setPosition(x, y, 0);
+            targetNode.setPosition(x, y, 0);
         } else {
-            // 竖屏：画布 750×1560，720×160，距离顶部 100px，X 居中
+            // 竖屏：720×160，顶部距离屏幕最上方 60px，X 居中
             ui.setContentSize(720, 160);
             let x = 720 * (0.5 - ui.anchorX);
-            let y = canvas_h / 2 - 140 - 160 * (1 - ui.anchorY);
-            this.cash_info.setPosition(x, y, 0);
+            let y = canvas_h / 2 - 60 - 160 * (1 - ui.anchorY);
+            targetNode.setPosition(x, y, 0);
         }
-        console.log(`  → cash_info pos=(${this.cash_info.position.x.toFixed(1)}, ${this.cash_info.position.y.toFixed(1)})`);
+        console.log(`  → cash_info pos=(${targetNode.position.x.toFixed(1)}, ${targetNode.position.y.toFixed(1)})`);
     }
 
     /** 递归刷新节点下所有子节点的 Widget */

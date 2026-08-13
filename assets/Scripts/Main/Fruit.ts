@@ -32,7 +32,7 @@ export default class Fruit extends Component {
         this.scheduleOnce(() => {
             //CC3.x 中正值=逆时针，取负实现顺时针
             this._rotateTween = tween(this.node)
-                .by(rotate_time + 0.5, { eulerAngles: new Vec3(0, 0, -angle) })
+                .by((rotate_time + 0.5) / 0.8, { eulerAngles: new Vec3(0, 0, -angle) })
                 .union()
                 .repeatForever()
                 .start();
