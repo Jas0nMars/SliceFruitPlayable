@@ -91,7 +91,7 @@ export class ScreenLayoutManager extends Component {
             console.log(`[ScreenLayoutManager] 延迟应用布局, is_landscape=${this.is_landscape}, layout_items.length=${this.layout_items.length}`);
             this.apply_layout();
             this.apply_cash_info_layout();
-        }, 0.1);
+        }, 0.025);
 
         // 通知 Game 初始方向（统一管理 cash_info / lb_cash_num / btn_wd 的横竖屏切换）
         let game_comp = this.node.getComponent('Game') as any;

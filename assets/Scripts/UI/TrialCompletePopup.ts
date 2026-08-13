@@ -1,4 +1,4 @@
-import { _decorator, AudioClip, AudioSource, Component, Label, Node, Sprite, SpriteFrame, tween, UIOpacity, UITransform, Vec3 } from 'cc';
+import { _decorator, AudioClip, AudioSource, Button, Component, EventTouch, Label, Node, Sprite, SpriteFrame, tween, UIOpacity, UITransform, Vec3 } from 'cc';
 import Game from '../Main/Game';
 import { I18nManager } from '../Main/I18nManager';
 import { SDKManager } from '../sdk/SDKManager';
@@ -50,6 +50,11 @@ export class TrialCompletePopup extends Component {
     private _breathing_tween_1: any = null;
     private _breathing_tween_2: any = null;
     private _audio_source: AudioSource = null;
+
+    onLoad() {
+        // 代码绑定 cash_btn 点击事件 → SDK 下载
+        this._bind_cash_btn();
+    }
 
     onEnable() {
         // 同步 MainAction 中的现金数值
@@ -362,25 +367,19 @@ export class TrialCompletePopup extends Component {
         }
     }
 
-    /**
-     * 点击"再玩一次"按钮
-     */
-    click_replay() {
-        console.log("[TrialComplete] 点击再玩一次");
-        if (this.game) {
-            this.game.kill_fruit_num = 0;
-            this.game.levelMgr.restart_cur_level();
-        }
-        this.node.active = false; // 触发 onDisable 清理动画
+    /** 为 cash_btn 绑定触摸事件（直接监听，避免被 mask 的 UITransform 拦截） */
+    private _bind_cash_btn() {
+        if (!this.cash_btn) return;
+        // 确保 cash_btn 有 UITransform 以接收触摸
+        let ui = this.cash_btn.getComponent(UITransform);
+        if (!ui) ui = this.cash_btn.addComponent(UITransform);
+        this.cash_btn.on(Node.EventType.TOUCH_END, this._on_cash_btn_click, this);
     }
 
-    /**
-     * 点击“关闭”按钮 / CTA 下载按钮
-     */
-    click_close() {
-        console.log("[TrialComplete] 点击关闭/CTA");
+    /** cash_btn 点击回调：触发 SDK 下载 */
+    private _on_cash_btn_click(event?: EventTouch) {
+        console.log('[TrialComplete] cash_btn clicked → triggerDownload');
         SDKManager.instance?.triggerDownload();
-        this.node.active = false;
     }
 
     gameEnd() {

@@ -1,4 +1,4 @@
-﻿import { _decorator, Component, Node, SpriteFrame, find, Prefab } from "cc";
+﻿import { _decorator, Component, Node, SpriteFrame, find, Prefab, EventHandler, Button } from "cc";
 import FruitPoolMgr from "./FruitPoolMgr";
 import InGameUI from "../UI/InGameUI";
 import LevelMgr from "../Level/LevelMgr";
@@ -80,6 +80,10 @@ export default class Game extends Component {
             this.soundMgr = this.node.addComponent(SoundManager);
         }
 
+        // 代码绑定 cash_info 按钮点击事件（场景中 target 为空，需代码补偿）
+        this._bind_btn_wd(this.btn_wd_portrait);
+        this._bind_btn_wd(this.btn_wd_landscape);
+
         // 初始化现金系统
         let canvas = find('Canvas');
         this.cashSystem = new CashSystem(
@@ -120,6 +124,9 @@ export default class Game extends Component {
         this.levelMgr.init(this);
         this.fruitPoolMgr.init(this);
         this.inGameUI.init(this);
+
+        // 资源加载完成，通知 SDK 游戏已就绪
+        SDKManager.instance?.gameReady();
     }
 
     /** 横竖屏切换时由 ScreenLayoutManager 调用（参考 yanglegeyang MainAction.set_orientation） */
@@ -144,7 +151,7 @@ export default class Game extends Component {
     }
 
     /**
-     * 鍒濆鍖?SDK 绠＄悊鍣紙鍦?Canvas 鑺傜偣涓婃煡鎵炬垨鍒涘缓 SDKManager 缁勪欢锛?
+     * 初始化 SDK 管理器（在 Canvas 节点上查找或创建 SDKManager 组件）
      */
     private _initSDKManager() {
         let canvas = find('Canvas');
@@ -157,12 +164,24 @@ export default class Game extends Component {
         if (!sdkComp) {
             sdkComp = sdkNode.addComponent(SDKManager);
         }
-        // 娉ㄥ唽 SDK 鎭㈠鍥炶皟
+        // 注册 SDK 恢复回调
         sdkComp.onResume(() => {
-            // SDK 鎭㈠鍙鍚庡彲鐢ㄤ簬閲嶆柊鍚姩娓告垙閫昏緫
+            // SDK 恢复可见后可用于重新启动游戏逻辑
         });
         console.log('[Game] SDKManager initialized');
     }
+    /** 为按钮绑定 click_btn_wd 事件 */
+    private _bind_btn_wd(btn: Node) {
+        if (!btn) return;
+        let button = btn.getComponent(Button);
+        if (!button) return;
+        let handler = new EventHandler();
+        handler.target = this.node;
+        handler.component = 'Game';
+        handler.handler = 'click_btn_wd';
+        button.clickEvents.push(handler);
+    }
+
     /**
      * BtnWd 点击事件：触发下载
      */
