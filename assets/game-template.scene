@@ -21,7 +21,7 @@
     "_active": true,
     "_components": [],
     "_prefab": {
-      "__id__": 154
+      "__id__": 157
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -52,7 +52,7 @@
     },
     "autoReleaseAssets": false,
     "_globals": {
-      "__id__": 155
+      "__id__": 158
     },
     "_id": "9db43614-5d89-481e-bcc1-8d4cd07455ba"
   },
@@ -84,19 +84,13 @@
       },
       {
         "__id__": 95
+      },
+      {
+        "__id__": 140
       }
     ],
     "_active": true,
     "_components": [
-      {
-        "__id__": 140
-      },
-      {
-        "__id__": 141
-      },
-      {
-        "__id__": 142
-      },
       {
         "__id__": 143
       },
@@ -108,6 +102,15 @@
       },
       {
         "__id__": 146
+      },
+      {
+        "__id__": 147
+      },
+      {
+        "__id__": 148
+      },
+      {
+        "__id__": 149
       }
     ],
     "_prefab": null,
@@ -3045,7 +3048,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": -744.8,
+      "y": -746.8,
       "z": 0
     },
     "_lrot": {
@@ -3144,7 +3147,7 @@
     "_left": 0,
     "_right": 0,
     "_top": 0,
-    "_bottom": 10,
+    "_bottom": 8,
     "_horizontalCenter": 0,
     "_verticalCenter": 0,
     "_isAbsLeft": true,
@@ -4628,6 +4631,87 @@
     "_id": "e5e74mi3RPgJuJBYljjIUa"
   },
   {
+    "__type__": "cc.Node",
+    "_name": "sdk_manager",
+    "_objFlags": 0,
+    "_parent": {
+      "__id__": 2
+    },
+    "_children": [],
+    "_active": true,
+    "_components": [
+      {
+        "__id__": 141
+      },
+      {
+        "__id__": 142
+      }
+    ],
+    "_prefab": null,
+    "_lpos": {
+      "__type__": "cc.Vec3",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "_lrot": {
+      "__type__": "cc.Quat",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "w": 1
+    },
+    "_lscale": {
+      "__type__": "cc.Vec3",
+      "x": 1,
+      "y": 1,
+      "z": 1
+    },
+    "_mobility": 0,
+    "_layer": 33554432,
+    "_euler": {
+      "__type__": "cc.Vec3",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "_id": "adeL6HmH1KEKLV/Iw/rVrO"
+  },
+  {
+    "__type__": "cc.UITransform",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 140
+    },
+    "_enabled": true,
+    "__prefab": null,
+    "_contentSize": {
+      "__type__": "cc.Size",
+      "width": 100,
+      "height": 100
+    },
+    "_anchorPoint": {
+      "__type__": "cc.Vec2",
+      "x": 0.5,
+      "y": 0.5
+    },
+    "_id": "9ePW5QGURHZ4UTXdrU9bqc"
+  },
+  {
+    "__type__": "4f8d0Sm5i9Dzb7g4eHXf7Ui",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 140
+    },
+    "_enabled": true,
+    "__prefab": null,
+    "channel": 2,
+    "storeUrl": "https://play.google.com/store/apps/details?id=com.starlightgame.crazyfruitbladewinner",
+    "_id": "11HfWwAslGeoGYc6swVXDS"
+  },
+  {
     "__type__": "cc.UITransform",
     "_name": "",
     "_objFlags": 0,
@@ -4791,15 +4875,6 @@
     "__prefab": null,
     "layout_items": [
       {
-        "__id__": 147
-      },
-      {
-        "__id__": 148
-      },
-      {
-        "__id__": 149
-      },
-      {
         "__id__": 150
       },
       {
@@ -4810,6 +4885,15 @@
       },
       {
         "__id__": 153
+      },
+      {
+        "__id__": 154
+      },
+      {
+        "__id__": 155
+      },
+      {
+        "__id__": 156
       }
     ],
     "cash_info": {
@@ -4962,22 +5046,22 @@
   {
     "__type__": "cc.SceneGlobals",
     "ambient": {
-      "__id__": 156
-    },
-    "shadows": {
-      "__id__": 157
-    },
-    "_skybox": {
-      "__id__": 158
-    },
-    "fog": {
       "__id__": 159
     },
-    "octree": {
+    "shadows": {
       "__id__": 160
     },
-    "lightProbeInfo": {
+    "_skybox": {
       "__id__": 161
+    },
+    "fog": {
+      "__id__": 162
+    },
+    "octree": {
+      "__id__": 163
+    },
+    "lightProbeInfo": {
+      "__id__": 164
     },
     "bakedWithStationaryMainLight": false
   },

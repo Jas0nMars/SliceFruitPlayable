@@ -134,7 +134,13 @@ export class ScreenLayoutManager extends Component {
             this.apply_cash_info_layout();
 
             console.log(`[ScreenLayoutManager] 切换为${this.is_landscape ? '横屏' : '竖屏'}模式`);
-        }
+
+            // 刘海屏设备安全区域可能在旋转后延迟更新，二次应用确保位置正确
+            this.scheduleOnce(() => {
+                let newSize = view.getVisibleSize();
+                console.log("[ScreenLayoutManager] " + "二次布局应用", newSize.width + "x" + newSize.height);
+                this.apply_cash_info_layout();
+            }, 0.1);        }
     }
 
     /** 查找场景中的 CashSystem（通过 Game 组件获取） */

@@ -1,7 +1,7 @@
 import { _decorator, AudioClip, AudioSource, Component, Label, Node, Sprite, SpriteFrame, tween, UIOpacity, UITransform, Vec3 } from 'cc';
 import Game from '../Main/Game';
 import { I18nManager } from '../Main/I18nManager';
-import { SDKManager } from '../Main/SDKManager';
+import { SDKManager } from '../sdk/SDKManager';
 const { ccclass, property } = _decorator;
 
 /**

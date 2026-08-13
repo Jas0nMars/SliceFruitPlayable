@@ -1,11 +1,11 @@
-import { _decorator, Component, Node, SpriteFrame, find, Prefab } from "cc";
+﻿import { _decorator, Component, Node, SpriteFrame, find, Prefab } from "cc";
 import FruitPoolMgr from "./FruitPoolMgr";
 import InGameUI from "../UI/InGameUI";
 import LevelMgr from "../Level/LevelMgr";
 import { TrialCompletePopup } from "../UI/TrialCompletePopup";
 import { CashSystem } from "./CashSystem";
 import { I18nManager } from "./I18nManager";
-import { SDKManager } from "./SDKManager";
+import { SDKManager } from "../sdk/SDKManager";
 import SoundManager from "./SoundManager";
 
 const { ccclass, property } = _decorator;
@@ -72,7 +72,7 @@ export default class Game extends Component {
         I18nManager.init('pt-BR');
 
         // 初始化 SDK
-        SDKManager.instance?.initSDK();
+        this._initSDKManager();
 
         // 初始化音效管理器
         this.soundMgr = this.node.getComponent(SoundManager);
@@ -143,6 +143,26 @@ export default class Game extends Component {
         return this.is_landscape ? this.cash_label_landscape : this.cash_label;
     }
 
+    /**
+     * 鍒濆鍖?SDK 绠＄悊鍣紙鍦?Canvas 鑺傜偣涓婃煡鎵炬垨鍒涘缓 SDKManager 缁勪欢锛?
+     */
+    private _initSDKManager() {
+        let canvas = find('Canvas');
+        let sdkNode = canvas.getChildByName('sdk_manager');
+        if (!sdkNode) {
+            sdkNode = new Node('sdk_manager');
+            sdkNode.setParent(canvas);
+        }
+        let sdkComp = sdkNode.getComponent(SDKManager);
+        if (!sdkComp) {
+            sdkComp = sdkNode.addComponent(SDKManager);
+        }
+        // 娉ㄥ唽 SDK 鎭㈠鍥炶皟
+        sdkComp.onResume(() => {
+            // SDK 鎭㈠鍙鍚庡彲鐢ㄤ簬閲嶆柊鍚姩娓告垙閫昏緫
+        });
+        console.log('[Game] SDKManager initialized');
+    }
     /**
      * BtnWd 点击事件：触发下载
      */
