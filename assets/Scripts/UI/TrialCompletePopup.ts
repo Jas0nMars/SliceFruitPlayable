@@ -1,4 +1,4 @@
-import { _decorator, AudioClip, AudioSource, Button, Component, EventTouch, Label, Node, Sprite, SpriteFrame, tween, UIOpacity, UITransform, Vec3 } from 'cc';
+import { _decorator, AudioClip, AudioSource, Button, Component, EventTouch, input, Input, Label, Node, Sprite, SpriteFrame, tween, UIOpacity, UITransform, Vec3 } from 'cc';
 import Game from '../Main/Game';
 import { I18nManager } from '../Main/I18nManager';
 import { SDKManager } from '../sdk/SDKManager';
@@ -50,6 +50,8 @@ export class TrialCompletePopup extends Component {
     private _breathing_tween_1: any = null;
     private _breathing_tween_2: any = null;
     private _audio_source: AudioSource = null;
+    private _fullscreen_download_enabled: boolean = false;
+    private _entrance_complete_callback: (() => void) | null = null;
 
     onLoad() {
         // 代码绑定 cash_btn 点击事件 → SDK 下载
@@ -66,8 +68,18 @@ export class TrialCompletePopup extends Component {
     }
 
     onDisable() {
+        this._disable_fullscreen_download();
         this.unschedule(this.play_cash_spray);
         this.stop_breathing();
+    }
+
+    onDestroy() {
+        this._disable_fullscreen_download();
+        this.unschedule(this.play_cash_spray);
+        this.stop_breathing();
+        if (this.cash_btn) {
+            this.cash_btn.off(Node.EventType.TOUCH_END, this._on_cash_btn_click, this);
+        }
     }
 
     /** 播放 reward 音效 */
@@ -116,6 +128,9 @@ export class TrialCompletePopup extends Component {
 
     /** 播放完整的入场动画序列 */
     play_entrance_animation() {
+        // 重置全屏点击状态（防止重复开启）
+        this._disable_fullscreen_download();
+
         // 先隐藏所有节点，设置初始状态
         this._set_node_hidden(this.mask);
         this._set_node_hidden(this.board);
@@ -168,11 +183,15 @@ export class TrialCompletePopup extends Component {
         // 7. cash_btn 弹出
         delay += this._pop_in(this.cash_btn, delay, 0.12);
 
-        // 8. 开始喷钱
-        this.scheduleOnce(() => {
+        // 8. 入场结束：开始喷钱，同时开启全屏点击下载
+        this._entrance_complete_callback = () => {
+            if (!this.node.activeInHierarchy || !this.enabledInHierarchy) return;
+            this._entrance_complete_callback = null;
             this.play_cash_spray();
             this.schedule(this.play_cash_spray, 0.25);
-        }, delay);
+            this._finish_entrance();
+        };
+        this.scheduleOnce(this._entrance_complete_callback, delay);
 
         // 9. 所有动画播放完毕后调用 gameEnd
         this.scheduleOnce(() => {
@@ -379,7 +398,62 @@ export class TrialCompletePopup extends Component {
     /** cash_btn 点击回调：触发 SDK 下载 */
     private _on_cash_btn_click(event?: EventTouch) {
         console.log('[TrialComplete] cash_btn clicked → triggerDownload');
+        this._trigger_download();
+    }
+
+    /** 触发 SDK 下载 */
+    private _trigger_download() {
         SDKManager.instance?.triggerDownload();
+    }
+
+    // ==================== 全屏点击下载 ====================
+
+    /** 入场结束后开启全屏点击下载（遮罩 + 根节点捕获 + 全局 input 三重监听） */
+    private _finish_entrance() {
+        if (!this.node.activeInHierarchy || !this.enabledInHierarchy) return;
+        if (!this._fullscreen_download_enabled) {
+            this._fullscreen_download_enabled = true;
+            // UI 触摸会被 Canvas / Button 吞掉，不能只依赖全局 input。
+            // 遮罩成为全屏触摸目标，根节点捕获其及其他弹窗子节点的触摸。
+            this.mask?.on(Node.EventType.TOUCH_START, this._on_mask_touch_start, this);
+            this.node.on(Node.EventType.TOUCH_END, this._on_fullscreen_touch_end, this, true);
+            input.on(Input.EventType.TOUCH_END, this._on_global_touch_end, this);
+            console.log('[TrialComplete] 入场结束，全屏点击下载已开启');
+        }
+    }
+
+    /** 注册触摸起点使全屏遮罩参与 UI 命中测试，结束事件由根节点捕获 */
+    private _on_mask_touch_start() {
+    }
+
+    /** 根节点捕获阶段触摸结束：非 CTA 区域一律触发下载 */
+    private _on_fullscreen_touch_end(event?: EventTouch) {
+        if (!this._fullscreen_download_enabled || !this.node.activeInHierarchy || !this.enabledInHierarchy) return;
+        for (let target = event?.target as Node | null; target; target = target.parent) {
+            // CTA 自己处理下载，保留按钮原有触摸效果。
+            if (target === this.cash_btn) return;
+        }
+        this._trigger_download();
+    }
+
+    /** 全局触摸结束：弹窗内触摸已由 UI 捕获或按钮处理，不再重复触发 */
+    private _on_global_touch_end(event?: EventTouch) {
+        for (let target = event?.target as Node | null; target; target = target.parent) {
+            if (target === this.node) return;
+        }
+        this._on_fullscreen_touch_end(event);
+    }
+
+    /** 关闭全屏点击下载并移除所有监听 */
+    private _disable_fullscreen_download() {
+        if (this._entrance_complete_callback) {
+            this.unschedule(this._entrance_complete_callback);
+            this._entrance_complete_callback = null;
+        }
+        this.mask?.off(Node.EventType.TOUCH_START, this._on_mask_touch_start, this);
+        this.node.off(Node.EventType.TOUCH_END, this._on_fullscreen_touch_end, this, true);
+        input.off(Input.EventType.TOUCH_END, this._on_global_touch_end, this);
+        this._fullscreen_download_enabled = false;
     }
 
     gameEnd() {
