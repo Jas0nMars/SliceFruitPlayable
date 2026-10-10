@@ -69,7 +69,7 @@ export default class Game extends Component {
         }
 
         // 初始化多语言系统
-        I18nManager.init('pt-BR');
+        I18nManager.init('id');
 
         // 初始化 SDK
         this._initSDKManager();
