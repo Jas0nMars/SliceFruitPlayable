@@ -29,7 +29,7 @@ interface LanguageRewardConfig {
 const LANGUAGE_REWARD_MAP: Record<string, LanguageRewardConfig> = {
     'id':    { min: 30000,  max: 50000  },
     'pt-BR': { min: 500,  max: 800  },
-    'en':    { min: 10,   max: 20   },
+    'en':    { min: 100,   max: 200   },
 };
 
 const DEFAULT_REWARD: LanguageRewardConfig = { min: 10, max: 20 };
